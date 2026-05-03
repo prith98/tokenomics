@@ -7,8 +7,10 @@ import { fmtMs, fmtUsd } from '../lib/format';
 const MODELS = [
   'gpt-4o-mini',
   'gpt-4o',
+  'o3',
   'claude-haiku-4-5',
-  'claude-sonnet-4-5',
+  'claude-sonnet-4-6',
+  'claude-opus-4-6',
   'mock-fast',
 ] as const;
 
