@@ -1,0 +1,77 @@
+version: 1
+
+# Rules are evaluated against every request after token estimation
+# but before provider dispatch. All matching rules are evaluated; the
+# highest-severity action wins (REJECT > THROTTLE > REROUTE > ALLOW).
+#
+# Scope semantics for `when:`
+#   - omit a key  -> dimension ignored
+#   - "*"         -> request must have a value for that dimension (any non-empty)
+#   - "literal"   -> request must match exactly
+#
+# Metrics are read from the SQLite cost_events table (persisted history only).
+rules:
+  - id: team-daily-budget
+    description: Cap platform-team's gateway spend at $1.00 per UTC day.
+    when:
+      team_id: platform-team
+    if:
+      metric: daily_spend_usd
+      op: gte
+      value: 1.00
+    action:
+      type: REJECT
+      message: Platform team daily budget of $1.00 exhausted.
+
+  - id: agent-iteration-cap
+    description: Stop runaway agent loops after 10 requests in a session.
+    when:
+      agent_id: "*"
+      session_id: "*"
+    if:
+      metric: session_request_count
+      op: gte
+      value: 10
+    action:
+      type: REJECT
+      message: Agent session exceeded 10-request iteration cap.
+
+  - id: agent-token-cap
+    description: Stop sessions that have already burned 100k tokens.
+    when:
+      agent_id: "*"
+      session_id: "*"
+    if:
+      metric: session_total_tokens
+      op: gte
+      value: 100000
+    action:
+      type: REJECT
+      message: Agent session exceeded 100,000 token cap.
+
+  - id: force-haiku-routing
+    description: Route the cheap-classifier feature off expensive models.
+    when:
+      feature_id: expensive-classifier
+    action:
+      type: REROUTE
+      to:
+        model: claude-haiku-4-5
+        provider: anthropic
+
+cache:
+  enabled: true
+  backend: redis
+  feature_configs:
+    doc-summarizer:
+      enabled: true
+      similarity_threshold: 0.92
+      ttl_seconds: 3600
+    expensive-classifier:
+      enabled: true
+      similarity_threshold: 0.95
+      ttl_seconds: 86400
+    chat-assistant:
+      enabled: false
+      similarity_threshold: 0.92
+      ttl_seconds: 3600

@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(90, 169, 255, 0.06), transparent 60%),
+    radial-gradient(900px 500px at 5% 110%, rgba(165, 132, 255, 0.06), transparent 60%),
+    #08090b;
+}
+
+::selection {
+  background: rgba(90, 169, 255, 0.35);
+}
+
+/* Dense numerics use tabular figures */
+.tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+}
+
+/* Subtle scrollbars */
+.scrollbar-thin::-webkit-scrollbar { width: 8px; height: 8px; }
+.scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 4px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+@keyframes flash-in {
+  0%   { background-color: rgba(90, 169, 255, 0.18); }
+  100% { background-color: transparent; }
+}
+.flash-in {
+  animation: flash-in 1.4s ease-out;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.55; transform: scale(0.92); }
+}
+.pulse-dot {
+  animation: pulse-dot 1.6s ease-in-out infinite;
+}

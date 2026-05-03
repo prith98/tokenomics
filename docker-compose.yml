@@ -1,0 +1,44 @@
+services:
+  app:
+    build: .
+    ports:
+      - "${PORT:-8080}:8080"
+    environment:
+      PORT: "8080"
+      REDIS_URL: "redis://redis:6379"
+      SQLITE_PATH: "/data/gateway.db"
+      OPENAI_API_KEY: "${OPENAI_API_KEY:-}"
+      MOCK_MODE: "${MOCK_MODE:-}"
+      LOG_LEVEL: "${LOG_LEVEL:-info}"
+      CACHE_ENABLED: "true"
+    volumes:
+      - gateway_data:/data
+      - ./policy.yaml:/app/policy.yaml:ro
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/healthz"]
+      interval: 10s
+      timeout: 3s
+      start_period: 15s
+      retries: 3
+
+  redis:
+    image: redis/redis-stack:latest
+    ports:
+      - "6379:6379"
+      - "8001:8001"   # RedisInsight UI
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  redis_data:
+  gateway_data:

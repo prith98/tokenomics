@@ -1,0 +1,31 @@
+app = "tokenomics-gateway"
+primary_region = "iad"
+
+[build]
+
+[env]
+  PORT = "8080"
+  LOG_LEVEL = "info"
+  CACHE_ENABLED = "true"
+  SQLITE_PATH = "/data/gateway.db"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [http_service.concurrency]
+    type = "connections"
+    hard_limit = 100
+    soft_limit = 80
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
+
+[[mounts]]
+  source = "gateway_data"
+  destination = "/data"
+  initial_size = "1gb"
