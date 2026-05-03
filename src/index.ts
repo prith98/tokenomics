@@ -1,4 +1,5 @@
 import { config } from './config.js';
+import { seedDemoData } from './demoSeed.js';
 import { log } from './log.js';
 import { buildApp } from './server.js';
 import { startPolicyWatcher } from './pipeline/policy.js';
@@ -12,4 +13,5 @@ app.listen(config.port, () => {
     { port: config.port, mockMode: config.mockMode },
     'tokenomics gateway listening',
   );
+  seedDemoData();
 });
