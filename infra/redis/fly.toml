@@ -1,0 +1,13 @@
+app = "tokenomics-redis"
+primary_region = "iad"
+
+[build]
+  image = "redis/redis-stack-server:latest"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"
+
+[[mounts]]
+  source = "redis_data"
+  destination = "/data"
